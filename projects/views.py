@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 from django.http import HttpResponse
@@ -17,11 +19,12 @@ def project(request,pk):
     tags = project.tags.all()
     return render(request, 'projects/single-project.html',{'project':project, 'tags':tags})
 
+@login_required(login_url='login')
 def createProject(request):
     form = ProjectForm()
 
     if request.method == 'POST':
-        form= ProjectForm(request.POST)
+        form= ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('projects')
@@ -33,7 +36,7 @@ def UpdateProject(request,pk):
     form = ProjectForm(instance=project)
 
     if request.method == 'POST':
-        form= ProjectForm(request.POST,instance=project)
+        form= ProjectForm(request.POST, request.FILES,instance=project)
         if form.is_valid():
             form.save()
             return redirect('projects')
